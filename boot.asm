@@ -11,14 +11,30 @@ start:
 
 step2:
     cli
-    mov ax, 0x7c0
+    mov ax, 0x7c0  
     mov ds, ax
     mov es, ax
     mov ax, 0x00
     mov ss, ax
     mov sp, 0x7c00
     sti
-    mov si, message
+
+    mov ah, 2
+    mov al, 1
+    mov ch, 0
+    mov cl, 2
+    mov dh, 0
+    mov bx, buffer
+    int 0x13
+
+    mov si, buffer
+    call print
+    
+    jc error
+    jmp $
+
+error:
+    mov si, error_message
     call print
     jmp $
 
@@ -38,7 +54,9 @@ print_char:
     int 10h
     ret
 
-message : db "This is my first boot loader", 0
+error_message: db "Failed to load sector", 0    
 
 times 510-($-$$) db 0
 dw 0xaa55
+
+buffer:
