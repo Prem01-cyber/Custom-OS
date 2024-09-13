@@ -8,6 +8,11 @@ SECTIONS
         *(.text)
     }
 
+    .asm :
+    {
+        *(.asm)
+    }
+
     .rodata :
     {
         *(.rodata)
