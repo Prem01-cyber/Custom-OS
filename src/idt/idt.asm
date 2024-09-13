@@ -1,9 +1,10 @@
 section .asm
 
 extern int21h_handler
-extern no_interrupt_handler 
-global idt_load
+extern no_interrupt_handler
+
 global int21h
+global idt_load
 global no_interrupt
 global enable_interrupts
 global disable_interrupts
@@ -16,21 +17,21 @@ disable_interrupts:
     cli
     ret
 
+
 idt_load:
     push ebp
     mov ebp, esp
 
     mov ebx, [ebp+8]
     lidt [ebx]
-    pop ebp
+    pop ebp    
     ret
+
 
 int21h:
     cli
     pushad
-
     call int21h_handler
-
     popad
     sti
     iret
@@ -42,3 +43,5 @@ no_interrupt:
     popad
     sti
     iret
+
+    
