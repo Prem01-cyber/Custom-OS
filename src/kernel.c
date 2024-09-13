@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "idt/idt.h"
+#include "io/io.h"
 
 
 uint16_t *video_mem = 0;
@@ -71,4 +72,6 @@ void kernel_main()
     terminal_initialize();
     print("Hello, World!\nWoowww");
     idt_init();
+
+    enable_interrupts();
 }
