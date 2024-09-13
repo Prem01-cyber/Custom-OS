@@ -4,6 +4,7 @@
 #include "idt/idt.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "disk/disk.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -92,6 +93,9 @@ void kernel_main()
 
     // Enable paging
     enable_paging();
+
+    char buf[512];
+    disk_read_sector(0, 1, buf);
     
     // Enable the system interrupts
     enable_interrupts();
