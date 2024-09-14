@@ -4,9 +4,10 @@
 #include "idt/idt.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "string/string.h"
+#include "fs/file.h"
 #include "disk/disk.h"
 #include "fs/pparser.h"
-#include "string/string.h"
 #include "disk/streamer.h"
 
 uint16_t *video_mem = 0;
@@ -72,6 +73,9 @@ void kernel_main()
     // Initialize the heap
     kheap_init();
 
+    // Initialize the file system
+    fs_init();
+
     // Initialize the disk
     disk_search_and_init();
 
@@ -89,4 +93,10 @@ void kernel_main()
 
     // Enable the system interrupts
     enable_interrupts();
+
+    char buf[20];
+    strcpy(buf, "Hello world\n");
+    while (1)
+    {
+    }
 }
