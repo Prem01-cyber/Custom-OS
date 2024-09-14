@@ -2,6 +2,7 @@
 #define DISK_H
 
 #include <stdint.h>
+#include "fs/file.h"
 
 typedef unsigned int PEACHOS_DISK_TYPE;
 
@@ -11,6 +12,8 @@ struct disk
 {
     PEACHOS_DISK_TYPE type;
     int sector_size;
+
+    struct filesystem *filesystem;
 };
 
 void disk_search_and_init();
