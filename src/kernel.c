@@ -68,7 +68,7 @@ static struct paging_4gb_chunk *kernel_chunk = 0;
 void kernel_main()
 {
     terminal_initialize();
-    print("Hello world!\ntest");
+    print("Hello world!\ntest\n");
 
     // Initialize the heap
     kheap_init();
@@ -98,8 +98,9 @@ void kernel_main()
     if (fd)
     {
         print("We opened test.txt\n");
-        char buf[6];
-        fread(buf, 6, 1, fd);
+        char buf[70];
+        fread(buf, 70, 1, fd);
+        buf[69] = 0;   
         print(buf);
     }
     while (1)

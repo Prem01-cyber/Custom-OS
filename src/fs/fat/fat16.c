@@ -437,7 +437,7 @@ static int fat16_read_internal_from_stream(struct disk *disk, struct disk_stream
     int offset_from_cluster = offset % size_of_cluster_bytes;
 
     int starting_sector = fat16_cluster_to_sector(private, cluster_to_use);
-    int starting_pos = (starting_sector * disk->sector_size) * offset_from_cluster;
+    int starting_pos = (starting_sector * disk->sector_size) + offset_from_cluster;
     int total_to_read = total > size_of_cluster_bytes ? size_of_cluster_bytes : total;
     res = diskstreamer_seek(stream, starting_pos);
     if (res != PEACHOS_ALL_OK)
