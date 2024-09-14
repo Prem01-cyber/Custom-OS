@@ -89,12 +89,4 @@ void kernel_main()
 
     // Enable the system interrupts
     enable_interrupts();
-
-    struct disk_stream *stream = diskstreamer_new(0);
-    disksstreamer_seek(stream, 0x201);
-    unsigned char c = 0;
-    diskstreamer_read(stream, &c, 1);
-    while (1)
-    {
-    }
 }
