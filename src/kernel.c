@@ -99,7 +99,8 @@ void kernel_main()
     {
         print("We opened test.txt\n");
         char buf[70];
-        fread(buf, 70, 1, fd);
+        fseek(fd, 2, SEEK_SET);
+        fread(buf, 68, 1, fd);
         buf[69] = 0;   
         print(buf);
     }
