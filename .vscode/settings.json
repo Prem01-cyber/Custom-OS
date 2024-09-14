@@ -2,6 +2,7 @@
     "files.associations": {
         "kernel.h": "c",
         "idt.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "status.h": "c"
     }
 }
