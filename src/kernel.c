@@ -99,6 +99,8 @@ void kernel_main()
     {
         struct file_stat s;
         fstat(fd, &s);
+        fclose(fd);
+        print("The file has closed successfully\n");
     }
     while (1)
     {
