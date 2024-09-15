@@ -7,10 +7,10 @@
 #include "fat/fat16.h"
 #include "status.h"
 #include "kernel.h"
-struct filesystem *filesystems[PEACHOS_MAX_FILESYSTEMS];
-struct file_descriptor *file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];
+struct filesystem* filesystems[PEACHOS_MAX_FILESYSTEMS];
+struct file_descriptor* file_descriptors[PEACHOS_MAX_FILE_DESCRIPTORS];
 
-static struct filesystem **fs_get_free_filesystem()
+static struct filesystem** fs_get_free_filesystem()
 {
     int i = 0;
     for (i = 0; i < PEACHOS_MAX_FILESYSTEMS; i++)
@@ -24,16 +24,14 @@ static struct filesystem **fs_get_free_filesystem()
     return 0;
 }
 
-void fs_insert_filesystem(struct filesystem *filesystem)
+void fs_insert_filesystem(struct filesystem* filesystem)
 {
-    struct filesystem **fs;
+    struct filesystem** fs;
     fs = fs_get_free_filesystem();
     if (!fs)
     {
-        print("Problem inserting filesystem");
-        while (1)
-        {
-        }
+        print("Problem inserting filesystem"); 
+        while(1) {}
     }
 
     *fs = filesystem;
@@ -56,20 +54,20 @@ void fs_init()
     fs_load();
 }
 
-static void file_free_descriptor(struct file_descriptor *desc)
+static void file_free_descriptor(struct file_descriptor* desc)
 {
-    file_descriptors[desc->index - 1] = 0x00;
+    file_descriptors[desc->index-1] = 0x00;
     kfree(desc);
 }
 
-static int file_new_descriptor(struct file_descriptor **desc_out)
+static int file_new_descriptor(struct file_descriptor** desc_out)
 {
     int res = -ENOMEM;
     for (int i = 0; i < PEACHOS_MAX_FILE_DESCRIPTORS; i++)
     {
         if (file_descriptors[i] == 0)
         {
-            struct file_descriptor *desc = kzalloc(sizeof(struct file_descriptor));
+            struct file_descriptor* desc = kzalloc(sizeof(struct file_descriptor));
             // Descriptors start at 1
             desc->index = i + 1;
             file_descriptors[i] = desc;
@@ -82,7 +80,7 @@ static int file_new_descriptor(struct file_descriptor **desc_out)
     return res;
 }
 
-static struct file_descriptor *file_get_descriptor(int fd)
+static struct file_descriptor* file_get_descriptor(int fd)
 {
     if (fd <= 0 || fd >= PEACHOS_MAX_FILE_DESCRIPTORS)
     {
@@ -94,9 +92,9 @@ static struct file_descriptor *file_get_descriptor(int fd)
     return file_descriptors[index];
 }
 
-struct filesystem *fs_resolve(struct disk *disk)
+struct filesystem* fs_resolve(struct disk* disk)
 {
-    struct filesystem *fs = 0;
+    struct filesystem* fs = 0;
     for (int i = 0; i < PEACHOS_MAX_FILESYSTEMS; i++)
     {
         if (filesystems[i] != 0 && filesystems[i]->resolve(disk) == 0)
@@ -109,28 +107,28 @@ struct filesystem *fs_resolve(struct disk *disk)
     return fs;
 }
 
-FILE_MODE file_get_mode_by_string(const char *str)
+FILE_MODE file_get_mode_by_string(const char* str)
 {
     FILE_MODE mode = FILE_MODE_INVALID;
     if (strncmp(str, "r", 1) == 0)
     {
         mode = FILE_MODE_READ;
     }
-    else if (strncmp(str, "w", 1) == 0)
+    else if(strncmp(str, "w", 1) == 0)
     {
         mode = FILE_MODE_WRITE;
     }
-    else if (strncmp(str, "a", 1) == 0)
+    else if(strncmp(str, "a", 1) == 0)
     {
         mode = FILE_MODE_APPEND;
     }
     return mode;
 }
 
-int fopen(const char *filename, const char *mode_str)
+int fopen(const char* filename, const char* mode_str)
 {
     int res = 0;
-    struct path_root *root_path = pathparser_parse(filename, NULL);
+    struct path_root* root_path = pathparser_parse(filename, NULL);
     if (!root_path)
     {
         res = -EINVARG;
@@ -145,7 +143,7 @@ int fopen(const char *filename, const char *mode_str)
     }
 
     // Ensure the disk we are reading from exists
-    struct disk *disk = disk_get(root_path->drive_no);
+    struct disk* disk = disk_get(root_path->drive_no);
     if (!disk)
     {
         res = -EIO;
@@ -165,14 +163,14 @@ int fopen(const char *filename, const char *mode_str)
         goto out;
     }
 
-    void *descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
+    void* descriptor_private_data = disk->filesystem->open(disk, root_path->first, mode);
     if (ISERR(descriptor_private_data))
     {
         res = ERROR_I(descriptor_private_data);
         goto out;
     }
 
-    struct file_descriptor *desc = 0;
+    struct file_descriptor* desc = 0;
     res = file_new_descriptor(&desc);
     if (res < 0)
     {
@@ -191,15 +189,16 @@ out:
     return res;
 }
 
-int fstat(int fd, struct file_stat *stat)
+int fstat(int fd, struct file_stat* stat)
 {
     int res = 0;
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct file_descriptor* desc = file_get_descriptor(fd);
     if (!desc)
     {
         res = -EIO;
         goto out;
     }
+
     res = desc->filesystem->stat(desc->disk, desc->private, stat);
 out:
     return res;
@@ -208,19 +207,18 @@ out:
 int fclose(int fd)
 {
     int res = 0;
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct file_descriptor* desc = file_get_descriptor(fd);
     if (!desc)
     {
         res = -EIO;
         goto out;
     }
-    res = desc->filesystem->close(desc->private);
 
+    res = desc->filesystem->close(desc->private);
     if (res == PEACHOS_ALL_OK)
     {
         file_free_descriptor(desc);
     }
-
 out:
     return res;
 }
@@ -228,7 +226,7 @@ out:
 int fseek(int fd, int offset, FILE_SEEK_MODE whence)
 {
     int res = 0;
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct file_descriptor* desc = file_get_descriptor(fd);
     if (!desc)
     {
         res = -EIO;
@@ -239,8 +237,7 @@ int fseek(int fd, int offset, FILE_SEEK_MODE whence)
 out:
     return res;
 }
-
-int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
 {
     int res = 0;
     if (size == 0 || nmemb == 0 || fd < 1)
@@ -249,15 +246,14 @@ int fread(void *ptr, uint32_t size, uint32_t nmemb, int fd)
         goto out;
     }
 
-    struct file_descriptor *desc = file_get_descriptor(fd);
+    struct file_descriptor* desc = file_get_descriptor(fd);
     if (!desc)
     {
         res = -EINVARG;
         goto out;
     }
 
-    res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char *)ptr);
-
+    res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char*) ptr);
 out:
     return res;
 }
